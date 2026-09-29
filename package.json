@@ -1,0 +1,111 @@
+{
+  "name": "@hoyasumii/signoz",
+  "version": "0.1.0",
+  "signozVersion": "0.142.1",
+  "description": "Unofficial SigNoz SDK (REST API v0.142.1, typed), with an MCP server (stdio and HTTP) and a CLI",
+  "author": "Alan Reis",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hoyasumii/signoz.git"
+  },
+  "homepage": "https://hoyasumii.github.io/signoz/",
+  "bugs": {
+    "url": "https://github.com/Hoyasumii/signoz/issues"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/index.d.ts",
+      "default": "./dist/mcp/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "mcp": [
+        "dist/mcp/index.d.ts"
+      ]
+    }
+  },
+  "bin": {
+    "signoz-mcp": "dist/mcp/cli.js",
+    "signoz": "dist/cli/index.js"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=tests/unit",
+    "test:live": "jest --testPathPattern=tests/live",
+    "test:watch": "jest --watch",
+    "clean": "node -e \"for (const dir of ['dist', 'node_modules']) require('fs').rmSync(dir, { recursive: true, force: true })\"",
+    "check:types": "tsc --noEmit -p tsconfig.jest.json",
+    "check:lint": "oxlint",
+    "fix:lint": "oxlint --fix",
+    "check:format": "oxfmt --check",
+    "fix:format": "oxfmt",
+    "codegen": "ts-node --transpile-only --project tsconfig.jest.json scripts/generate.ts && oxfmt src/generated",
+    "codegen:mcp": "ts-node --transpile-only --project tsconfig.jest.json scripts/build-mcp-catalog.ts",
+    "mcp": "node dist/mcp/cli.js",
+    "cli": "node dist/cli/index.js",
+    "docs:dev": "pnpm --filter @hoyasumii/signoz-website start",
+    "docs:build": "pnpm --filter @hoyasumii/signoz-website build",
+    "docs:serve": "pnpm --filter @hoyasumii/signoz-website serve",
+    "docs:deploy": "pnpm --filter @hoyasumii/signoz-website run deploy",
+    "prepare": "husky",
+    "prepublishOnly": "pnpm build",
+    "check:knip": "knip",
+    "fix:knip": "knip --fix"
+  },
+  "keywords": [
+    "signoz",
+    "sdk",
+    "observability",
+    "opentelemetry",
+    "mcp",
+    "typescript",
+    "node"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1",
+    "citty": "^0.1.6",
+    "cross-spawn": "^7.0.6",
+    "jsonc-parser": "^3.3.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@types/cross-spawn": "^6.0.6",
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "dotenv": "^17.4.2",
+    "husky": "^9.1.7",
+    "jest": "^29.0.0",
+    "knip": "^6.38.0",
+    "openapi-typescript": "^7.13.0",
+    "oxfmt": "^0.42.0",
+    "oxlint": "^1.57.0",
+    "ts-jest": "^29.4.4",
+    "ts-node": "^10.9.0",
+    "typescript": "5.9.3",
+    "yaml": "^2.9.1"
+  },
+  "packageManager": "pnpm@11.5.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

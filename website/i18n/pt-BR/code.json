@@ -1,0 +1,65 @@
+{
+  "home.title": {
+    "message": "SDK, servidor MCP e CLI do SigNoz"
+  },
+  "home.tagline": {
+    "message": "Um SDK TypeScript para a API do SigNoz, com um servidor MCP e uma CLI construídos sobre ele. Use-o no código, a partir de um agente de IA ou no terminal: os três compartilham o mesmo cliente."
+  },
+  "home.getStarted": {
+    "message": "Começar"
+  },
+  "home.sdk.description": {
+    "message": "Um cliente tipado para as 241 operações da API REST do SigNoz v0.142.1, um método por operationId, com uma API key ou os tokens da sessão do navegador, rotacionados para você."
+  },
+  "home.mcp.description": {
+    "message": "O SigNoz para o Claude Code, o Codex, o OpenCode ou qualquer cliente MCP: logs, traces, métricas e alertas, um construtor de dashboards que confere cada painel antes de salvar e ferramentas genéricas para o resto da API."
+  },
+  "home.cli.description": {
+    "message": "Cada ferramenta MCP como um comando de terminal, mais signoz mcp para rodar o servidor em segundo plano, iniciá-lo no login e registrá-lo nos seus clientes."
+  },
+  "home.mcp.title": {
+    "message": "Servidor MCP"
+  },
+  "home.badge": {
+    "message": "TypeScript · SigNoz v0.142.1 · MCP · CLI"
+  },
+  "home.headline": {
+    "message": "A API do SigNoz, tipada de ponta a ponta"
+  },
+  "home.install.copy": {
+    "message": "Copiar"
+  },
+  "home.install.copied": {
+    "message": "Copiado"
+  },
+  "theme.SearchBar.label": {
+    "message": "Buscar"
+  },
+  "theme.SearchBar.seeAll": {
+    "message": "Ver todos os resultados"
+  },
+  "theme.SearchBar.noResultsText": {
+    "message": "Nenhum resultado"
+  },
+  "theme.SearchBar.searchInContext": {
+    "message": "Ver todos os resultados em \"{context}\""
+  },
+  "theme.SearchBar.seeAllOutsideContext": {
+    "message": "Ver todos os resultados fora de \"{context}\""
+  },
+  "theme.SearchPage.existingResultsTitle": {
+    "message": "Resultados da busca por \"{query}\""
+  },
+  "theme.SearchPage.emptyResultsTitle": {
+    "message": "Buscar na documentação"
+  },
+  "theme.SearchPage.documentsFound.plurals": {
+    "message": "1 documento encontrado|{count} documentos encontrados"
+  },
+  "theme.SearchPage.noResultsText": {
+    "message": "Nenhum documento encontrado"
+  },
+  "theme.SearchPage.searchContext.everywhere": {
+    "message": "Em todo lugar"
+  }
+}
