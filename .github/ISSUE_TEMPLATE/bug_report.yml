@@ -1,0 +1,59 @@
+name: Bug report
+description: Something in the SDK, the MCP server or the CLI does not work as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security problems do not go here: report them privately, as [SECURITY.md](https://github.com/Hoyasumii/signoz/blob/main/SECURITY.md) describes.
+        Never paste an API key or auth/refresh token, and check that logs and responses carry none.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - SDK (createSignozClient and the generated services)
+        - SDK — authentication (API key, session tokens, FileTokenStore)
+        - MCP server — curated tools (logs, traces, metrics, alerts)
+        - MCP server — dashboards (signoz_create_dashboard, presets)
+        - MCP server — generic tools (signoz_resources, signoz_describe, signoz_call)
+        - CLI (signoz, signoz mcp …)
+        - Docs site
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you got instead. Include the full error.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: The smallest code, command or tool call that shows it.
+      render: typescript
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: "@hoyasumii/signoz version"
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: signoz-version
+    attributes:
+      label: SigNoz instance
+      description: SigNoz Cloud, or the self-hosted version. The SDK is generated from SigNoz v0.142.1.
+      placeholder: "SigNoz Cloud / self-hosted v0.142.1"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Node.js version and OS
+      description: For the MCP server or the CLI, say also which client runs it (Claude Code, Codex, OpenCode) and whether through WSL.
+      placeholder: "Node 22.11, Ubuntu 24.04 on WSL2"

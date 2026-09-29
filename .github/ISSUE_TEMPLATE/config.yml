@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Hoyasumii/signoz/security/advisories/new
+    about: Report it privately, never in a public issue.
+  - name: Documentation
+    url: https://hoyasumii.github.io/signoz/
+    about: Guides for the SDK, the MCP server and the CLI.
+  - name: A problem with SigNoz itself
+    url: https://github.com/SigNoz/signoz/issues
+    about: Bugs in the SigNoz app or its API belong upstream.
