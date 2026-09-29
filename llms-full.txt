@@ -1,0 +1,828 @@
+# @hoyasumii/signoz
+
+> A TypeScript SDK for the SigNoz API, with an MCP server and a CLI built on top of it.
+
+This file contains all documentation content in a single document following the llmstxt.org standard.
+
+## Getting started
+
+`@hoyasumii/signoz` is a TypeScript SDK for the [SigNoz](https://signoz.io) REST API, with an MCP server and a
+CLI built on top of it. Use it from code, from an AI agent, or from your terminal: all three share the same
+client.
+
+- **SDK**: the 241 operations of the official SigNoz v0.142.1 spec, one typed method per `operationId`. It
+  authenticates with a service account API key or with the browser session's tokens, rotating them for you.
+  Start at [SDK](./sdk/overview.md).
+- **MCP server** (`@hoyasumii/signoz/mcp`, bin `signoz-mcp`): stdio or Streamable HTTP on `127.0.0.1`. Curated
+  tools for services, logs, traces, metrics and alerts, a dashboard builder that checks every panel against
+  SigNoz before saving, and generic tools for the rest of the API. Start at [MCP server](./mcp/overview.md).
+- **CLI** (`signoz`): every MCP tool as a subcommand, plus `signoz mcp` to configure the server, run it in the
+  background, start it at login and register it in Claude Code, Codex and OpenCode. Start at
+  [CLI](./cli/overview.md).
+
+This is an independent, **unofficial** project, not affiliated with SigNoz Inc.
+
+### Installation
+
+Requires Node.js 20 or later.
+
+```bash
+npm i -g @hoyasumii/signoz     # or: pnpm add -g @hoyasumii/signoz
+signoz mcp config              # the instance URL and an API key (or the browser tokens), saved per user
+signoz mcp install             # registers the server (stdio) in Claude Code / Codex / OpenCode
+```
+
+As a library, `npm install @hoyasumii/signoz`.
+
+### Versions
+
+The package has its own version; each release mirrors one SigNoz API version. Use the one that matches your
+instance. `signoz whoami` shows it as `sdkSignozVersion`, and the SDK exports it as `SIGNOZ_API_VERSION`.
+
+| `@hoyasumii/signoz` | SigNoz API |
+| ------------------- | ---------- |
+| 0.1.x               | v0.142.1   |
+
+### A first call
+
+```ts
+import { createSignozClient } from "@hoyasumii/signoz";
+
+const signoz = createSignozClient({ baseUrl: "https://signoz.example.com", apiKey: process.env.SIGNOZ_API_KEY! });
+const me = await signoz.users.getMyUser();
+```
+
+From the terminal, once `signoz mcp config` has saved a configuration:
+
+```bash
+signoz whoami
+signoz list-services --since 24h
+```
+
+`signoz docs` opens this site.
+
+---
+
+## Authentication
+
+The client takes **either** an API key **or** the browser session's token pair. Passing both is a
+`SignozConfigError`.
+
+### API key (recommended)
+
+In SigNoz, open **Settings → Service Accounts**, create an account with the role you need and generate a key.
+
+```ts
+const signoz = createSignozClient({ baseUrl, apiKey: process.env.SIGNOZ_API_KEY! });
+```
+
+The key goes in the `SigNoz-Api-Key` header (exported as `API_KEY_HEADER`). It does not expire with a session and
+does not compete with your browser for one.
+
+### Browser session
+
+With SigNoz open and logged in, open DevTools → **Application → Local Storage** → the SigNoz URL and copy
+`AUTH_TOKEN` and `REFRESH_AUTH_TOKEN`.
+
+```ts
+import { createSignozClient, FileTokenStore } from "@hoyasumii/signoz";
+
+const signoz = createSignozClient({
+  baseUrl,
+  authToken: process.env.SIGNOZ_AUTH_TOKEN!,
+  refreshAuthToken: process.env.SIGNOZ_REFRESH_AUTH_TOKEN!,
+  tokenStore: new FileTokenStore(".signoz-session.json"),
+});
+```
+
+- Every call sends `Authorization: Bearer <authToken>`.
+- A 401 triggers `POST /api/v2/sessions/rotate` and the call is retried once. The rotate is single-flight:
+  concurrent calls that get a 401 share one rotate.
+- A refused rotate throws `SignozSessionExpiredError`: copy fresh tokens from the browser.
+- The session expires after 7 idle days or 30 days in total.
+- With the `opaque` tokenizer, the SDK and the browser compete for the same session. Prefer the API key, or log
+  in just for this in a private window.
+
+#### Keeping the rotated pair
+
+A rotated pair lives in memory unless you keep it:
+
+- `onTokensRotated(tokens)` is called on every rotate, to persist the pair yourself.
+- `tokenStore` persists it for you. `FileTokenStore` writes a JSON file with mode 0600 (on Windows the folder's
+  ACL protects it), through a rename that retries while another process holds the file.
+
+The store remembers which pair the saved one descends from (`tokenPairHash`). On the next start, the saved pair
+wins while the given pair is unchanged, since it is newer; once you paste a new pair, the new pair wins.
+
+`createSignozClientFromEnv()` sets this up on its own: it keeps the pair in `SIGNOZ_TOKEN_FILE` or
+`.signoz-session.json` (`tokenFile: false` turns that off).
+
+`signoz.auth` says which mode the client uses (`"api_key"` or `"session"`), and `signoz.tokens` gives the current
+pair.
+
+---
+
+## Errors
+
+| Class                       | When                                                                               |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| `SignozApiError`            | A non-2xx response                                                                 |
+| `SignozSessionExpiredError` | The session rotate was refused: copy fresh tokens (a subclass of `SignozApiError`) |
+| `SignozConfigError`         | Invalid configuration: a missing credential, a malformed URL, both credentials     |
+| `SignozTimeoutError`        | No response within `timeoutMs` (per attempt)                                       |
+
+`SignozApiError` carries `status`, `method`, `path` (without the query string), `operationId`, `code` (SigNoz's
+`error.code`, or `errorType` on the Prometheus routes), `type` (e.g. `unauthenticated`, `not-found`) and the
+response `body`.
+
+```ts
+import { SignozApiError } from "@hoyasumii/signoz";
+
+try {
+  await signoz.dashboard.getDashboardV2({ path: { id: "missing" } });
+} catch (error) {
+  if (error instanceof SignozApiError && error.status === 404) {
+    // …
+  } else throw error;
+}
+```
+
+### Secrets never show
+
+Every error's message and `body` go through `redact`: the values of keys such as `authorization`, `apiKey`,
+`accessToken` or `refreshToken` become `***`, and so does any literal occurrence of the client's own token or
+key, inside strings too. `redact` is exported for your own logs:
+
+```ts
+import { redact } from "@hoyasumii/signoz";
+
+console.log(redact(payload, [process.env.SIGNOZ_API_KEY!]));
+```
+
+---
+
+## Overview
+
+## SDK
+
+```ts
+import { createSignozClient } from "@hoyasumii/signoz";
+
+const signoz = createSignozClient({ baseUrl: "https://signoz.example.com", apiKey: process.env.SIGNOZ_API_KEY! });
+
+const me = await signoz.users.getMyUser();
+const page = await signoz.dashboard.listDashboardsV2({ query: { limit: 20 } });
+const result = await signoz.querier.queryRangeV5({
+  body: {
+    /* Querybuildertypesv5QueryRangeRequest */
+  },
+});
+```
+
+`baseUrl` is the instance URL, with its base path if it has one (`https://example.com/signoz`). The client is
+generated from `spec/openapi.v0.142.1.yml`: one service per tag of the spec (`signoz.dashboard`,
+`signoz.rules`, `signoz.querier`, …) and one method per `operationId`. Each method takes
+`{ path, query, body }` as the operation declares them, typed from the spec's `components["schemas"]`.
+
+`createSignozClientFromEnv()` reads `SIGNOZ_BASE_URL` and `SIGNOZ_API_KEY`, or else the
+`SIGNOZ_AUTH_TOKEN`/`SIGNOZ_REFRESH_AUTH_TOKEN` pair (see [Authentication](./authentication.md)).
+
+### Options
+
+| Option      | What for                                                           |
+| ----------- | ------------------------------------------------------------------ |
+| `baseUrl`   | The instance URL (required)                                        |
+| `apiKey`    | A service account API key                                          |
+| `authToken` | With `refreshAuthToken`: the browser session instead of an API key |
+| `timeoutMs` | Timeout per attempt, default 30000; `0` or `Infinity` turn it off  |
+| `fetch`     | An alternative `fetch` (tests, a proxy)                            |
+
+Each method also takes a second argument, `RequestOptions`: `timeoutMs` for that call, a `signal` to cancel it,
+extra `headers`, and `raw: true` to get the `Response` unparsed (a non-2xx still throws).
+
+### Responses
+
+How a method answers depends on the operation:
+
+- the `data` of the `{ status, data }` envelope, for most of them;
+- `void` for a 204;
+- a streamed `Response` for the raw export;
+- the whole object on the Prometheus routes (`{ status, data, warnings, infos }`).
+
+A non-2xx becomes a `SignozApiError` (see [Errors](./errors.md)).
+
+### Routes outside the spec
+
+`signoz.request(method, path, { query, body })` calls any path with the client's authentication, rotating the
+session on a 401 like any generated method.
+
+### What the package exports
+
+- `OPERATIONS` and `OPERATION_METHODS`: every operation's method, path, response mode and whether it
+  authenticates, by `operationId`.
+- `SIGNOZ_API_VERSION`: the SigNoz version the client mirrors.
+- The spec's types: `components`, `operations`, `paths`.
+
+For every exported class, type and function, see the [API reference](pathname://../../docs/api).
+
+---
+
+## Alerts
+
+| Tool                  | What it answers                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| `signoz_list_alerts`  | Alerts active right now (firing or silenced): name, severity, since when, summary and labels |
+| `signoz_list_rules`   | Every rule: id, name, state (firing/inactive/disabled), severity, type and evaluation window |
+| `signoz_get_rule`     | One rule in full: its condition (queries and threshold), labels, annotations and channels    |
+| `signoz_rule_history` | When a rule fired and resolved in a window (timeline), with totals                           |
+
+`signoz_list_alerts` and `signoz_list_rules` take a `search` text; `signoz_list_rules` also takes a `state`.
+`signoz_rule_history` takes the rule's `id` and a window (`since`, or `start`/`end`), which lines a spike up with
+the alerts it raised.
+
+Creating, changing or silencing rules, channels and downtimes goes through the
+[generic tools](./generic-tools.md): `signoz_resources` with `rules`, `channels` or `downtime` finds the operation.
+
+---
+
+## Configuration
+
+Each setting comes from a flag, then the environment, then the file `signoz mcp config` saved, then the default.
+
+| Variable                    | What for                                                                     |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| `SIGNOZ_BASE_URL`           | The instance URL                                                             |
+| `SIGNOZ_API_KEY`            | A service account API key                                                    |
+| `SIGNOZ_AUTH_TOKEN`         | With `SIGNOZ_REFRESH_AUTH_TOKEN`: the browser session, instead of an API key |
+| `SIGNOZ_REFRESH_AUTH_TOKEN` | The session's refresh token                                                  |
+| `SIGNOZ_ENV`                | The `deployment.environment` the telemetry tools filter on by default        |
+| `PORT`                      | The HTTP port (default 3767)                                                 |
+| `SIGNOZ_CONFIG`             | Where the saved configuration lives (also `--config`)                        |
+
+When both an API key and a token pair are set, the API key wins. See [Authentication](../sdk/authentication.md)
+for where each comes from.
+
+### Where it is saved
+
+- `~/.config/signoz/.env` on Linux;
+- `~/Library/Application Support/signoz/.env` on macOS;
+- `%APPDATA%\signoz\.env` on Windows;
+- or wherever `SIGNOZ_CONFIG`/`--config` points.
+
+The file is written with mode 0600 (on Windows the folder's ACL protects it). With the browser tokens, the rotated
+pair goes to `session.json` beside the `.env`, shared by stdio, the daemon and the CLI.
+
+Secrets never show up in errors, logs, `--help` or the configuration form.
+
+---
+
+## Dashboards
+
+`signoz_create_dashboard` builds a dashboard in SigNoz's v2 format (Perses, `schemaVersion: "v6"`) on a 12-column
+grid, and answers its `url`.
+
+### Presets
+
+- `api_red`: requests, error rate, p50/p95/p99 latency, requests by status, the endpoints that fail the most and
+  the latest failed requests. Built from the service's entry spans (`kind_string = 'Server'`, adjustable in
+  `filter`); `routeAttribute` names the endpoint (default `http.route`).
+- `worker_failures`: runs and failures per job, p95 duration, a per-job table, the latest failures and error
+  logs. `filter` picks the spans that are jobs (e.g. `name LIKE 'job.%'`), and `jobAttribute` the attribute that
+  names them (default the span name).
+- `logs_errors`: ERROR/FATAL by severity and the latest lines.
+
+Each preset takes a `service`, and optionally an `environment` and a `title`.
+
+### Your own panels
+
+`sections` holds your own sections (a collapsible row each, with a `title`) of `panels`:
+
+| Field                  | What for                                                        |
+| ---------------------- | --------------------------------------------------------------- |
+| `title`, `description` | The panel's header                                              |
+| `kind`                 | `timeseries`, `bar`, `number`, `table`, `pie`, `list` or `text` |
+| `queries`, `formulas`  | Builder queries (A, B, …) and formulas such as `A / B * 100`    |
+| `promql`               | A PromQL query instead of builder queries                       |
+| `text`                 | Markdown, for a `text` panel                                    |
+| `unit`                 | `ns`, `ms`, `s`, `percent`, `reqps`, `short`, `bytes`…          |
+| `thresholds`           | Lines (timeseries/bar) or colour rules (number)                 |
+| `width`, `height`      | Columns out of 12, and rows                                     |
+
+Several queries, or any formula, make one composite query per panel. `list` panels take one builder query with no
+aggregation, and show raw log lines or spans.
+
+Try a panel first with `signoz_preview_panel`: it runs the same definition against live data and answers what the
+panel would show, or SigNoz's error.
+
+### The check before saving
+
+Before saving, every panel runs its query on SigNoz (`validate: "run"`, over `checkWindow`, default `1h`). If a
+panel fails, nothing is saved, and the answer says which panel failed with SigNoz's own message. Panels with no
+data in the check window are listed too. `dryRun: true` answers the JSON without saving.
+
+Trace and log panels are builder queries, so SigNoz offers **View traces / View logs** when you click a point on
+the chart, over the same interval.
+
+### Example
+
+```bash
+signoz list-services --since 24h --search point
+signoz create-dashboard --title "Point — API and workers (production)" --tags team:point \
+  --presets '[{"preset":"api_red","service":"point-api"},{"preset":"worker_failures","service":"point-worker"},{"preset":"logs_errors","service":"point-api"}]'
+```
+
+### Changing and sharing
+
+- `signoz_update_dashboard` with `mode: "append"` (default) adds presets and sections below the existing panels;
+  `mode: "replace"` rebuilds the dashboard from the input. Panels are checked the same way.
+- `signoz_list_dashboards` and `signoz_get_dashboard` read them back (`raw: true` for the full JSON).
+- `signoz_share_dashboard` makes a dashboard viewable without login through a public link. Anyone with the link
+  sees its data, so it needs `confirm: true`. Sharing inside the organization needs no call: send the dashboard's
+  URL.
+
+---
+
+## Generic tools
+
+The curated tools cover telemetry, alerts and dashboards. For everything else (saved views, notification channels,
+downtimes, service accounts, users, …) three tools reach the other ~230 operations of the REST API.
+
+1. **`signoz_resources`** lists the services and their operations. With a `query` (e.g. `saved view`,
+   `downtime`, `notification channel`), only the matching ones.
+2. **`signoz_describe`** gives one operation's full signature: path and query parameters, the body schema, the
+   permission it needs and an example `signoz_call` input. With `schema`, it expands one schema from the spec
+   (`depth` levels deep, default 3).
+3. **`signoz_call`** runs it: `operation` is `service.method` (`savedView.createSavedView`) or the `operationId`
+   (`CreateSavedView`), and `args` holds `path`, `query` and `body`.
+
+```json
+{ "operation": "rules.listRules", "args": {} }
+```
+
+### Safety
+
+- Unknown parameters are refused, so a typo does not silently drop a filter.
+- Destructive operations (delete, revoke, disconnect, unlock) need `confirm: true`. The agent is told to ask you
+  first.
+- Session lifecycle operations, SSO callbacks and the raw export are left out of the catalog.
+- A long answer is cut at 60,000 characters, saying so.
+
+The catalog is generated from the same OpenAPI spec as the SDK (`pnpm codegen:mcp`).
+
+---
+
+## Overview(Mcp)
+
+## MCP server
+
+`signoz-mcp` exposes SigNoz to Claude Code, Codex, OpenCode or any other MCP client.
+
+```bash
+signoz-mcp            # stdio: what the MCP client runs
+signoz-mcp --http     # http://127.0.0.1:3767/mcp (PORT changes the port)
+signoz mcp start      # the same in the background; stop/status; boot enable to start it at login
+```
+
+### Tools
+
+| Tool                                                                                   | What for                                                                                       |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `signoz_whoami`                                                                        | Instance, auth mode, user or service account                                                   |
+| `signoz_list_services`                                                                 | Services with spans, errors, error rate and p95: the starting point to find the `service.name` |
+| `signoz_field_keys` / `signoz_field_values`                                            | Discover attributes (`http.route`, `deployment.environment`, job name…) and their values       |
+| `signoz_search_logs`                                                                   | Logs by service, severity, text and v5 filter, newest first                                    |
+| `signoz_search_traces` / `signoz_get_trace`                                            | Spans by service, operation, error and duration; a trace as a waterfall with its exceptions    |
+| `signoz_query`                                                                         | Builder queries (traces, logs, metrics) with formulas, or PromQL                               |
+| `signoz_list_metrics` / `signoz_query_metrics`                                         | Discover metrics and query them                                                                |
+| `signoz_list_alerts` / `signoz_list_rules` / `signoz_get_rule` / `signoz_rule_history` | Firing alerts, rules and history                                                               |
+| `signoz_list_dashboards` / `signoz_get_dashboard`                                      | Dashboards and their panels, with a link                                                       |
+| `signoz_preview_panel`                                                                 | Runs a panel definition on real data before saving                                             |
+| `signoz_create_dashboard` / `signoz_update_dashboard`                                  | Creates or extends a dashboard from presets and/or your own panels                             |
+| `signoz_share_dashboard`                                                               | Makes the dashboard public (requires `confirm: true`)                                          |
+| `signoz_resources` / `signoz_describe` / `signoz_call`                                 | The other ~230 operations: saved views, channels, downtimes, service accounts…                 |
+
+- [Telemetry tools](./telemetry-tools.md): services, logs, traces, queries and metrics.
+- [Alerts](./alerts.md): firing alerts, rules and their history.
+- [Dashboards](./dashboards.md): the presets, your own panels and the check before saving.
+- [Generic tools](./generic-tools.md): the rest of the REST API.
+
+### The HTTP mode
+
+- It is stateless and listens on `127.0.0.1` only.
+- It refuses a `Host` that is not loopback, against DNS rebinding.
+- `GET /health` answers `{ ok, baseUrl, auth, environment, version }`.
+- `POST /shutdown` with the token `signoz mcp start` generates closes it; that is how `signoz mcp stop` stops the
+  server, Windows included.
+
+In stdio mode, stdout carries the protocol: the server logs to stderr only.
+
+Errors never carry a credential: every tool error goes through the same masking as the SDK's.
+
+---
+
+## Programmatic use
+
+`@hoyasumii/signoz/mcp` exports the server and its transports.
+
+### Stdio
+
+```ts
+import { serveSignozMcpStdio } from "@hoyasumii/signoz/mcp";
+
+const mcp = await serveSignozMcpStdio({ baseUrl: "https://signoz.example.com", apiKey: process.env.SIGNOZ_API_KEY! });
+await mcp.closed; // settles when the client closes stdin
+```
+
+stdout carries the protocol, so nothing else may write to it. `stdin`/`stdout` can be other streams.
+
+### HTTP
+
+```ts
+import { startSignozMcpServer } from "@hoyasumii/signoz/mcp";
+
+const server = await startSignozMcpServer({ port: 0, baseUrl, apiKey });
+console.log(server.url); // http://127.0.0.1:<port>/mcp
+await server.close();
+```
+
+`port: 0` picks a free port. `shutdownToken` enables `POST /shutdown` (the request carries it in
+`X-Signoz-Shutdown`), and `onShutdown` runs after it closed the server.
+
+Both take `apiKey` or `authToken` + `refreshAuthToken`, `environment` (the default `deployment.environment`) and
+`sessionFile` (where rotated tokens persist).
+
+### Any transport
+
+```ts
+import { createSignozClient } from "@hoyasumii/signoz";
+import { buildSignozMcpServer } from "@hoyasumii/signoz/mcp";
+
+const server = buildSignozMcpServer(createSignozClient({ baseUrl, apiKey }), { environment: "production" });
+await server.connect(transport);
+```
+
+`buildSignozMcpServer` answers the bare `McpServer`, with every tool registered and no transport attached.
+
+### Also exported
+
+- `resolveMcpConfig`, `clientFor`, `configFilePath`, `readEnvFile`, `writeEnvFile`: the configuration the CLI uses.
+- `CATALOG`, `searchCatalog`, `describeOperation`, `invoke`: what the generic tools run on.
+- `buildDashboard`: the dashboard builder, from the same input `signoz_create_dashboard` takes.
+
+---
+
+## Setup
+
+### The quick way
+
+Save your settings once, then let the CLI register the server in the clients it finds:
+
+```bash
+npx signoz mcp config    # asks for the instance URL, an API key (or the browser tokens), an environment and a port
+npx signoz mcp install   # finds Claude Code, Codex and OpenCode on your PATH and registers signoz-mcp (stdio)
+```
+
+`install` shows a checklist of the clients it found. Tick the ones you want, and it registers the server through
+each client's own CLI, under the name `signoz`. The registered command reads the saved configuration when the
+client launches it, so no credential ends up in the client's config. See
+[`signoz mcp install`](../cli/mcp-commands.md#signoz-mcp-install) for the flags.
+
+### By hand: stdio
+
+Let the client start `signoz-mcp`. It reads the saved configuration, so the client config needs no keys:
+
+```json
+{
+  "mcpServers": {
+    "signoz": { "command": "npx", "args": ["-y", "-p", "@hoyasumii/signoz", "signoz-mcp"] }
+  }
+}
+```
+
+In Claude Code:
+
+```bash
+claude mcp add signoz -- npx -y -p @hoyasumii/signoz signoz-mcp
+```
+
+Without a saved configuration, or to override it, give the client an `env` block with `SIGNOZ_BASE_URL` and
+`SIGNOZ_API_KEY` (see [Configuration](./configuration.md)):
+
+```json
+{
+  "mcpServers": {
+    "signoz": {
+      "command": "npx",
+      "args": ["-y", "-p", "@hoyasumii/signoz", "signoz-mcp"],
+      "env": { "SIGNOZ_BASE_URL": "https://signoz.example.com", "SIGNOZ_API_KEY": "your-api-key" }
+    }
+  }
+}
+```
+
+### By hand: HTTP
+
+Run one server in the background and point your clients at its URL:
+
+```bash
+npx signoz mcp start          # prints the URL, http://127.0.0.1:3767/mcp by default
+claude mcp add --transport http signoz http://127.0.0.1:3767/mcp
+```
+
+Without the CLI, `signoz-mcp --http` runs it in the foreground with the settings from the environment or the saved
+configuration. `signoz-mcp --help` lists the flags. To start the server at every login, run
+`npx signoz mcp boot enable` (see [`signoz mcp boot`](../cli/mcp-commands.md#signoz-mcp-boot)).
+
+### Checking it works
+
+Ask your agent to call `signoz_whoami`, or run it from the terminal:
+
+```bash
+npx signoz whoami
+```
+
+It answers the instance URL, the auth mode, the user or service account, the SigNoz version the SDK mirrors and
+the default environment.
+
+---
+
+## Telemetry tools
+
+### Windows and environments
+
+Every telemetry tool takes its window as `since` (`15m`, `6h`, `7d`; default `1h`) or as `start`/`end` (ISO 8601
+or epoch milliseconds; `end` defaults to now).
+
+The tools that filter by environment add `deployment.environment = <SIGNOZ_ENV>` when a default environment is
+configured. `environment` on a call picks another one, and `environment: "all"` drops the filter. `signoz_query`
+is the exception: it adds the filter only when you pass `environment`.
+
+Filters use SigNoz's v5 expression syntax: `service.name = 'point-api' AND has_error = true`.
+
+### Find what exists first
+
+| Tool                   | What it answers                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `signoz_list_services` | Services that sent spans in the window: spans, errors, error rate, p95. `search` narrows |
+| `signoz_field_keys`    | Attribute and resource field names for a `signal` (`traces`, `logs`, `metrics`)          |
+| `signoz_field_values`  | Values of one field (`name`), optionally narrowed by `search` and by `existingQuery`     |
+
+Use them to find the exact `service.name`, the attribute that names a route or a job, and the environments.
+
+### Logs and traces
+
+- `signoz_search_logs`: the latest lines by `service`, `severity` (e.g. `["ERROR", "FATAL"]`), `text` (a substring of
+  the body) and `filter`, newest first. Rows carry `trace_id` when the log is correlated; `withAttributes` adds
+  every attribute.
+- `signoz_search_traces`: the latest spans by `service`, `operation` (the span name), `errorsOnly`,
+  `minDurationMs` and `filter`, newest first or slowest first (`orderBy`). `fields` adds attributes to each row.
+- `signoz_get_trace`: one trace as a waterfall, with the root service, span and error counts, each span's depth,
+  duration and key HTTP/DB attributes, and its exceptions.
+
+### Queries
+
+`signoz_query` runs builder queries over traces, logs or metrics, with formulas, or a PromQL query: the same
+queries a dashboard panel runs. `requestType` picks the shape:
+
+- `time_series` (default): each series summarized as min, max, average, last value and the time of the peak.
+  `withPoints` adds up to 60 points per series; `stepSeconds` sets the bucket size.
+- `scalar`: one row per group.
+- `raw`: rows.
+
+Use it to investigate a spike, and to check a query before putting it on a dashboard.
+
+### Metrics
+
+- `signoz_list_metrics`: metric names received in the window, with type, unit and description. With `name`, the
+  metadata of that one metric (type, temporality, unit).
+- `signoz_query_metrics`: one metric over time, by `metric` with `timeAggregation` (default `rate`; `avg` or
+  `latest` for gauges), `spaceAggregation` (default `sum`; `p50`…`p99` for histograms), `filter` and `groupBy` —
+  or `promql` instead.
+
+---
+
+## signoz mcp
+
+## `signoz mcp`
+
+`signoz mcp` manages the MCP server for you: its saved configuration, a background HTTP server, a login service,
+and its registration in your MCP clients.
+
+```bash
+npx signoz mcp config                 # asks for the settings in the terminal and saves them
+npx signoz mcp config --env production --port 4000   # no prompts (scripts, CI): saves just these, keeps the rest
+npx signoz mcp config --web           # the same, in a local web form
+npx signoz mcp install                # pick Claude Code / Codex / OpenCode and register signoz-mcp (stdio) in them
+npx signoz mcp install --client claude,opencode --force   # no picker (scripts, CI); --force replaces an entry
+npx signoz mcp uninstall              # pick the clients to remove the 'signoz' entry from (no saved config needed)
+npx signoz mcp start                  # start in the background (needs a saved config); prints the URL for `claude mcp add`
+npx signoz mcp start --api-key other --port 4000   # one-off values, never saved
+npx signoz mcp status                 # running or stopped (exit 3), URL, pid, uptime
+npx signoz mcp stop
+npx signoz mcp boot enable            # start at every login; `boot disable` / `boot status`
+```
+
+### `signoz mcp config`
+
+Writes the saved `.env` ([Configuration](../mcp/configuration.md)). It works three ways:
+
+- **In the terminal** (the default). It asks for each setting in turn, starting from the saved values. Secrets are
+  typed masked: enter keeps the saved one, and `-` clears it.
+- **With flags.** Given any of `--base-url`, `--api-key`, `--auth-token`, `--refresh-auth-token`, `--env` or
+  `--port`, it asks nothing and saves just those. Without a terminal, it needs them. A secret passed as a flag
+  stays in your shell history, so prefer the prompt for it.
+- **In a web form** with `--web`: a local page, opened in the browser (`--no-open` to only print its URL). A blank
+  secret keeps the saved one.
+
+If a server is running, it says so: restart it to pick the changes up. `--config <file>` (or `SIGNOZ_CONFIG`)
+writes another file.
+
+### `signoz mcp install`
+
+Detects each client by running its `--version`, and registers the stdio server through the client's own CLI,
+under the name `signoz`:
+
+| Client      | Command it runs             |
+| ----------- | --------------------------- |
+| Claude Code | `claude mcp add -s user`    |
+| Codex       | `codex mcp add`             |
+| OpenCode    | `opencode mcp add --global` |
+
+The registered command is `node <package>/dist/mcp/cli.js` by absolute path, with no credential: the server reads
+the saved file when the client launches it (`SIGNOZ_CONFIG` is passed only when `--config` names another file).
+
+Every client found starts ticked. One that already has a `signoz` entry is marked `already installed, reinstalls`
+and gets it replaced. Without an interactive terminal, `--client` is required (`claude`, `codex`, `opencode`;
+inside WSL also `claude@windows`, `codex@windows`, `opencode@windows`), plus `--force` to replace an entry.
+`--dry-run` prints the commands instead of running them.
+
+Both `install` and `uninstall` work on each client's user-level (global) config. Project-scoped entries are never
+touched.
+
+### `signoz mcp uninstall`
+
+Lists the clients with a `signoz` entry, showing whether it is `stdio` or `http`, and removes any entry of that
+name: `claude mcp remove -s user`, `codex mcp remove`, and for OpenCode (which has no `remove`) an edit of its
+global config file that deletes only that key, keeping comments and layout.
+
+It is the one command besides `signoz mcp config` that runs without a saved configuration, so a client can be
+cleaned up after the configuration is gone. `--client` and `--dry-run` work as in `install`.
+
+### `signoz mcp start`, `stop` and `status`
+
+`start` runs the HTTP server detached, with its pid and log in `<config dir>/run/`, and prints its URL, its log file
+and the `claude mcp add` line to register it. It needs a saved configuration. `--api-key`, `--base-url`, `--env`
+and `--port` override it for this run only, and are never saved. `--foreground` serves in the current process
+instead.
+
+`status` prints whether the server is running, with its URL, pid and uptime, and exits with code 3 when it is not.
+`stop` asks the server to shut down through a token-guarded `POST /shutdown`, and signals the process only if that
+fails.
+
+### `signoz mcp boot`
+
+`boot enable` installs a service of the current user that starts the server at every login, so no sudo is needed:
+
+| OS      | Service                                                         |
+| ------- | --------------------------------------------------------------- |
+| Linux   | a systemd user unit (on WSL, enable systemd in `/etc/wsl.conf`) |
+| macOS   | a LaunchAgent                                                   |
+| Windows | a logon task                                                    |
+
+The service reads only the saved configuration. `boot disable` removes it and `boot status` reports it.
+
+---
+
+## CLI overview
+
+## CLI
+
+The package installs a `signoz` command. It is an MCP client of the [same server](../mcp/overview.md): every MCP
+tool becomes a subcommand, and the tool's input schema becomes its flags. By default the server runs inside the
+command, so there is nothing to start first.
+
+```bash
+npx signoz mcp config                          # once: the instance URL and an API key (or the browser tokens)
+npx signoz tools                               # every command, one per MCP tool
+npx signoz whoami
+npx signoz list-services --since 24h
+npx signoz search-logs --service point-api --severity ERROR,FATAL --since 30m
+npx signoz search-traces --service point-api --errors-only --min-duration-ms 500
+npx signoz get-trace --trace-id 4bf92f3577b34da6a3ce929d0e0e4736
+npx signoz resources --query "saved view"
+npx signoz call --operation rules.listRules
+```
+
+Nothing but `--help`, `--version`, `signoz docs`, `signoz mcp config` and `signoz mcp uninstall` runs until a
+configuration with a URL and a credential is saved. `signoz docs` prints the link to this site and opens it in the
+browser.
+
+### From tools to commands
+
+- The command is the tool's name without `signoz_`, in kebab-case: `signoz_search_logs` → `search-logs`.
+- Each flag is an input in kebab-case: `traceId` → `--trace-id`, `errorsOnly` → `--errors-only`.
+- Array flags take `a,b` or JSON, object flags take JSON, and boolean flags need no value.
+- `signoz <command> --help` lists a command's flags, with the allowed values of enum inputs.
+
+Tool output goes to stdout. A tool error goes to stderr with exit code 1.
+
+### One-off settings and a running server
+
+`--base-url`, `--api-key` and `--env` override the environment and the saved file for one run of the in-process
+server. To use a `signoz-mcp` that is already running over HTTP instead, pass `--url http://127.0.0.1:3767/mcp` or
+set `SIGNOZ_MCP_URL`. These flags work anywhere on the command line.
+
+None of them stands in for the saved configuration: the CLI refuses to run tools without it, even when `--url` or
+`--api-key` is given.
+
+### Managing the server
+
+`signoz mcp` is intercepted before any connection is made. It configures the server, runs it in the background,
+starts it at login and registers it in your MCP clients. See [`signoz mcp`](./mcp-commands.md).
+
+---
+
+## Windows and WSL
+
+The package runs on Windows 10/11 with Node.js 20 or later, from PowerShell or cmd.
+
+- The settings file lives in `%APPDATA%\signoz\.env`, protected by that folder's per-user permissions (file modes
+  mean nothing on Windows).
+- `signoz mcp boot enable` registers a logon task.
+- `signoz mcp stop` asks the server to shut down through a token-guarded `POST /shutdown` before falling back to
+  terminating it: a signal on Windows is `TerminateProcess`, which would not let the server shut down.
+- The client CLIs are run through `cross-spawn`, so Windows `.cmd` shims work.
+- Files are written through a rename that retries, because antivirus and editors hold files open.
+
+### From WSL
+
+When the package is installed inside WSL, `signoz mcp install` and `uninstall` also list the clients installed on
+the Windows side, as `Claude Code (Windows)` and so on (`--client claude@windows`). They start the server with
+`wsl.exe -d <distro> -e node …/dist/mcp/cli.js`, so it keeps reading the configuration saved inside WSL. The first
+call after WSL has been idle waits for the distro to start (a second or two).
+
+The Windows side is reached through `powershell.exe`, taken from the PATH or, with `appendWindowsPath = false`,
+from `/mnt/c/Windows/System32/WindowsPowerShell/v1.0/`. When it cannot be reached, `--client claude@windows` says
+which step failed.
+
+To start the server at login inside WSL, enable systemd in `/etc/wsl.conf` first, then run
+`npx signoz mcp boot enable`.
+
+---
+
+## Contributing
+
+The repository is [Hoyasumii/signoz](https://github.com/Hoyasumii/signoz), managed with pnpm (Node.js 20 or later).
+
+```bash
+pnpm install          # dependencies, plus the git hooks (husky)
+pnpm build            # tsc → dist/ (CommonJS + .d.ts)
+pnpm test:unit        # jest, with a fake SigNoz on node:http (no network)
+pnpm test:live        # against a real instance (.env.test, from env.example)
+pnpm check:types      # tsc --noEmit over src, tests and scripts
+pnpm check:lint       # oxlint (`pnpm fix:lint` fixes what it can)
+pnpm check:format     # oxfmt, 120 columns (`pnpm fix:format` rewrites)
+pnpm check:knip       # unused files, exports and dependencies
+```
+
+Every script is cross-platform: no `rm`, `$VAR` or `VAR=1 cmd`. `.gitattributes` keeps LF, with `.cmd`/`.vbs` in
+CRLF.
+
+There is no CI: the checks run locally through git hooks. `pre-commit` runs `check:lint` and `check:format`,
+`commit-msg` runs commitlint with the conventional config (`feat: …`, `fix(mcp): …`), and `pre-push` runs
+`check:types`, `check:knip` and `test:unit`.
+
+After a push of `main` to `origin` that touches `website/` or `src/`, `pre-push` also starts
+`scripts/deploy-site.mjs` in the background. It waits for the push to land, checks the pushed commit out in a
+worktree of its own and runs `pnpm docs:deploy` there, so the site follows `main` without holding up the push. Its
+log is `site-deploy/deploy.log` under the git directory; `SIGNOZ_SKIP_SITE_DEPLOY=1` skips it for one push.
+
+### Generated code
+
+```bash
+pnpm codegen          # spec/openapi.v<version>.yml → src/generated/ (never edit by hand)
+pnpm codegen:mcp      # spec → src/mcp/generated/catalog.json (a unit test fails when it is stale)
+```
+
+To follow a new SigNoz version:
+
+1. Download the tag's `docs/api/openapi.yml` into `spec/`.
+2. Change `signozVersion` in `package.json`, bump `version` and add a row to the compatibility table.
+3. Run `pnpm codegen && pnpm codegen:mcp`.
+
+### This site
+
+The site is a Docusaurus workspace package in `website/`, in English and Portuguese (Brazil).
+
+```bash
+pnpm docs:dev                    # preview (append `--locale pt-BR` for the translation)
+pnpm docs:build                  # build every locale into website/build/
+pnpm docs:serve                  # serve the build (search only works on a build)
+GIT_USER=<user> pnpm docs:deploy # build and push to the gh-pages branch
+```
+
+- The guides are plain Markdown in `website/docs/`, mirrored page for page in
+  `website/i18n/pt-BR/docusaurus-plugin-content-docs/current/`: change both together.
+- The [API reference](pathname://../docs/api) is generated from `src/index.ts` and `src/mcp/index.ts` by TypeDoc
+  on every English build.
+- `llms.txt` and `llms-full.txt` are generated at the site's root from the English guides on every build.

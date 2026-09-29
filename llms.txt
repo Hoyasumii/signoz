@@ -1,0 +1,24 @@
+# @hoyasumii/signoz
+
+> A TypeScript SDK for the SigNoz API, with an MCP server and a CLI built on top of it.
+
+This file contains links to documentation sections following the llmstxt.org standard.
+
+## Table of Contents
+
+- [Getting started](https://hoyasumii.github.io/signoz/docs/intro): A TypeScript SDK for the SigNoz API, with an MCP server and a CLI built on it: what each part does and how to install it.
+- [Authentication](https://hoyasumii.github.io/signoz/docs/sdk/authentication): A service account API key, or the browser session's tokens with automatic rotation and a token file.
+- [Errors](https://hoyasumii.github.io/signoz/docs/sdk/errors): SignozApiError and the other error classes, and how secrets are masked in every one of them.
+- [Overview](https://hoyasumii.github.io/signoz/docs/sdk/overview): The SigNoz client: one typed method per operation, grouped by tag, and how responses and errors come back.
+- [Alerts](https://hoyasumii.github.io/signoz/docs/mcp/alerts): Firing alerts, alert rules and when a rule fired and resolved.
+- [Configuration](https://hoyasumii.github.io/signoz/docs/mcp/configuration): The settings the server and the CLI read, where they are saved, and the order they are resolved in.
+- [Dashboards](https://hoyasumii.github.io/signoz/docs/mcp/dashboards): Build SigNoz dashboards from presets and your own panels, checked against SigNoz before anything is saved.
+- [Generic tools](https://hoyasumii.github.io/signoz/docs/mcp/generic-tools): signoz_resources, signoz_describe and signoz_call: every other operation of the SigNoz REST API.
+- [Overview](https://hoyasumii.github.io/signoz/docs/mcp/overview): The SigNoz MCP server: transports, the curated tools, the dashboard builder and the generic tools.
+- [Programmatic use](https://hoyasumii.github.io/signoz/docs/mcp/programmatic): Run the SigNoz MCP server from your own code: over stdio, over HTTP, or on any MCP transport.
+- [Setup](https://hoyasumii.github.io/signoz/docs/mcp/setup): Save your settings once and register the SigNoz MCP server in Claude Code, Codex and OpenCode.
+- [Telemetry tools](https://hoyasumii.github.io/signoz/docs/mcp/telemetry-tools): Services, attributes, logs, traces, builder and PromQL queries, and metrics: the tools that read telemetry.
+- [signoz mcp](https://hoyasumii.github.io/signoz/docs/cli/mcp-commands): signoz mcp: save the configuration, run the server in the background, start it at login and register it in your MCP clients.
+- [CLI overview](https://hoyasumii.github.io/signoz/docs/cli/overview): The signoz command: every MCP tool as a subcommand, with the tool's input schema as its flags.
+- [Windows and WSL](https://hoyasumii.github.io/signoz/docs/cli/windows): Using the CLI on Windows 10/11 from PowerShell or cmd, and registering the server in Windows clients from WSL.
+- [Contributing](https://hoyasumii.github.io/signoz/docs/contributing): Set up the repository, run the checks and the tests, follow a new SigNoz version, and build this documentation site.
