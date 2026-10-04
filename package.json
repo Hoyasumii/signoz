@@ -1,6 +1,6 @@
 {
   "name": "@hoyasumii/signoz",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "signozVersion": "0.142.1",
   "description": "Unofficial SigNoz SDK (REST API v0.142.1, typed), with an MCP server (stdio and HTTP) and a CLI",
   "author": "Alan Reis",
