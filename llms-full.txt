@@ -788,14 +788,19 @@ pnpm check:knip       # unused files, exports and dependencies
 Every script is cross-platform: no `rm`, `$VAR` or `VAR=1 cmd`. `.gitattributes` keeps LF, with `.cmd`/`.vbs` in
 CRLF.
 
-There is no CI: the checks run locally through git hooks. `pre-commit` runs `check:lint` and `check:format`,
+The checks run locally through git hooks. `pre-commit` runs `check:lint` and `check:format`,
 `commit-msg` runs commitlint with the conventional config (`feat: …`, `fix(mcp): …`), and `pre-push` runs
 `check:types`, `check:knip` and `test:unit`.
 
-After a push of `main` to `origin` that touches `website/` or `src/`, `pre-push` also starts
-`scripts/deploy-site.mjs` in the background. It waits for the push to land, checks the pushed commit out in a
-worktree of its own and runs `pnpm docs:deploy` there, so the site follows `main` without holding up the push. Its
-log is `site-deploy/deploy.log` under the git directory; `SIGNOZ_SKIP_SITE_DEPLOY=1` skips it for one push.
+Every push to `main` runs the Continuous Delivery workflow (`.github/workflows/cd.yml`). It runs the same checks
+and the build, then:
+
+- publishes `package.json`'s version to npm when that version is not on the registry yet (through Trusted
+  Publishing, with provenance), tags it `v<version>` and opens a GitHub release;
+- builds the site and deploys it to the `gh-pages` branch when the push touches `website/` or `src/` (a manual run
+  of the workflow always deploys it).
+
+To release, bump `version` in `package.json` and merge to `main`.
 
 ### Generated code
 
