@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_hoyasumii_signoz_website=self.webpackChunk_hoyasumii_signoz_website||[]).push([["668"],{7934(e,s,i){i.r(s),i.d(s,{default:()=>o});var r=i(1058);i(3706);var a=i(3372),u=i(7597),n=i(1042),t=i(9401),c=i(3662);function o(e){return(0,r.jsx)(u.e3,{className:(0,a.A)(n.G.wrapper.docsPages),children:(0,r.jsx)(c.A,{children:(0,t.v)(e.route.routes)})})}}}]);
