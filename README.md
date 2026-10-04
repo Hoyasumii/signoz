@@ -240,8 +240,9 @@ pnpm codegen:mcp      # spec → src/mcp/generated/catalog.json (the test fails 
 ```
 
 Every script is cross-platform: no `rm`, `$VAR` or `VAR=1 cmd`. `.gitattributes` keeps LF, with
-`.cmd`/`.vbs` in CRLF. There is no CI: the husky hooks run lint and format on commit, and types, knip
-and unit tests on push.
+`.cmd`/`.vbs` in CRLF. The husky hooks run lint and format on commit, and types, knip
+and unit tests on push. Every push to `main` runs `.github/workflows/cd.yml`, which runs the same checks, publishes
+`package.json`'s version to npm when it is new and deploys the docs site.
 
 To follow a new SigNoz version:
 
