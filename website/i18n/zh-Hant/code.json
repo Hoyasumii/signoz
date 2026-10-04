@@ -1,0 +1,90 @@
+{
+  "home.sdk.description": {
+    "message": "241 操作的輸入客戶端 SigNoz v0.142.1 REST API, 每次操作Id 的一個方法, 有 API 金鑰或瀏覽器會話符旋轉給您 。"
+  },
+  "home.mcp.title": {
+    "message": "MCP 伺服器"
+  },
+  "home.mcp.description": {
+    "message": "SigNoz 用于 Claude Code, Codex, OpenCode 或任何 MCP 用戶端 : 紀錄、 追蹤、 標準與警示、 一個在儲存前檢查每個面板的仪表板建構器, 以及其它 API 的通用工具 。"
+  },
+  "home.cli.description": {
+    "message": "每個 MCP 工具作為終端命令, 加上 signoz mcp 來在背景中執行伺服器, 從登入開始, 在您的客戶端中登記 。"
+  },
+  "home.install.copied": {
+    "message": "复制"
+  },
+  "home.install.copy": {
+    "message": "复制"
+  },
+  "home.title": {
+    "message": "SigNoz SDK、 MCP 伺服器和 CLI"
+  },
+  "home.badge": {
+    "message": "TypeScript · SigNoz v0.142.1 · MCP · CLI"
+  },
+  "home.headline": {
+    "message": "其 SigNoz API, 輸入端至端"
+  },
+  "home.tagline": {
+    "message": "A TypeScript SDK 表示 SigNoz API, 上面建有 MCP 伺服器和 CLI 。 使用代碼、 AI 代理或您的终端: 三者共享同一客戶端 。"
+  },
+  "home.getStarted": {
+    "message": "開始吧"
+  },
+  "theme.colorToggle.ariaLabel.mode.system": {
+    "message": "系統模式",
+    "description": "The name for the system color mode"
+  },
+  "theme.IconExternalLink.ariaLabel": {
+    "message": "(在新分頁中開啟)",
+    "description": "The ARIA label for the external link icon"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.expandAriaLabel": {
+    "message": "展開降水",
+    "description": "The ARIA label of the button to expand the mobile dropdown navbar item"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.collapseAriaLabel": {
+    "message": "折叠掉落",
+    "description": "The ARIA label of the button to collapse the mobile dropdown navbar item"
+  },
+  "theme.SearchBar.noResultsText": {
+    "message": "沒有結果"
+  },
+  "theme.SearchBar.seeAllOutsideContext": {
+    "message": "看外面的所有結果 \"{context}\""
+  },
+  "theme.SearchBar.searchInContext": {
+    "message": "在其中看到所有成果 \"{context}\""
+  },
+  "theme.SearchBar.seeAll": {
+    "message": "看所有結果"
+  },
+  "theme.SearchBar.label": {
+    "message": "搜尋",
+    "description": "The ARIA label and placeholder for search button"
+  },
+  "theme.SearchPage.existingResultsTitle": {
+    "message": "搜索結果{query}\"",
+    "description": "The search page title for non-empty query"
+  },
+  "theme.SearchPage.emptyResultsTitle": {
+    "message": "搜尋文件",
+    "description": "The search page title for empty query"
+  },
+  "theme.SearchPage.searchContext.everywhere": {
+    "message": "到處"
+  },
+  "theme.SearchPage.documentsFound.plurals": {
+    "message": "找到 1 份文件|{count} 找到文件",
+    "description": "Pluralized label for \"{count} documents found\". Use as much plural forms (separated by \"|\") as your language support (see https://www.unicode.org/cldr/cldr-aux/charts/34/supplemental/language_plural_rules.html)"
+  },
+  "theme.SearchPage.noResultsText": {
+    "message": "未找到文件",
+    "description": "The paragraph for empty search result"
+  },
+  "theme.blog.author.pageTitle": {
+    "message": "{authorName} - {nPosts}",
+    "description": "The title of the page for a blog author"
+  }
+}

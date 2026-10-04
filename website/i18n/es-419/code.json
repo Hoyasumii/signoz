@@ -1,0 +1,74 @@
+{
+  "home.sdk.description": {
+    "message": "Un cliente tipo para las 241 operaciones de la SigNoz v0.142.1 REST API, un método por operationId, con una tecla API o las fichas de la sesión del navegador rotaron para usted."
+  },
+  "home.mcp.title": {
+    "message": "MCP server"
+  },
+  "home.mcp.description": {
+    "message": "SigNoz para Claude Code, Codex, OpenCode o cualquier cliente MCP: registros, trazas, métricas y alertas, un constructor de paneles que comprueba cada panel antes de guardar, y herramientas genéricas para el resto de la API."
+  },
+  "home.cli.description": {
+    "message": "Cada herramienta MCP como comando terminal, además de signoz mcp para ejecutar el servidor en el fondo, iniciarlo en el login y registrarlo en sus clientes."
+  },
+  "home.install.copied": {
+    "message": "Copiado"
+  },
+  "home.install.copy": {
+    "message": "Copiado"
+  },
+  "home.title": {
+    "message": "SigNoz SDK, servidor MCP y CLI"
+  },
+  "home.badge": {
+    "message": "TypeScript · SigNoz v0.142.1 · MCP · CLI"
+  },
+  "home.headline": {
+    "message": "El SigNoz API, terminal tipod al final"
+  },
+  "home.tagline": {
+    "message": "A TypeScript SDK para el SigNoz API, con un servidor MCP y un CLI construido sobre él. Úsalo de código, de un agente AI o de su terminal: los tres comparten el mismo cliente."
+  },
+  "home.getStarted": {
+    "message": "Empieza"
+  },
+  "theme.SearchBar.noResultsText": {
+    "message": "No hay resultados"
+  },
+  "theme.SearchBar.seeAllOutsideContext": {
+    "message": "Ver todos los resultados fuera de \"{context}\""
+  },
+  "theme.SearchBar.searchInContext": {
+    "message": "Ver todos los resultados dentro de \"{context}\""
+  },
+  "theme.SearchBar.seeAll": {
+    "message": "Ver todos los resultados"
+  },
+  "theme.SearchBar.label": {
+    "message": "Búsqueda",
+    "description": "The ARIA label and placeholder for search button"
+  },
+  "theme.SearchPage.existingResultsTitle": {
+    "message": "Resultados de búsqueda para \"{query}\"",
+    "description": "The search page title for non-empty query"
+  },
+  "theme.SearchPage.emptyResultsTitle": {
+    "message": "Buscar la documentación",
+    "description": "The search page title for empty query"
+  },
+  "theme.SearchPage.searchContext.everywhere": {
+    "message": "Por todos lados"
+  },
+  "theme.SearchPage.documentsFound.plurals": {
+    "message": "1 documento encontrado|{count} documentos encontrados",
+    "description": "Pluralized label for \"{count} documents found\". Use as much plural forms (separated by \"|\") as your language support (see https://www.unicode.org/cldr/cldr-aux/charts/34/supplemental/language_plural_rules.html)"
+  },
+  "theme.SearchPage.noResultsText": {
+    "message": "No se encontraron documentos",
+    "description": "The paragraph for empty search result"
+  },
+  "theme.blog.author.pageTitle": {
+    "message": "{authorName} - {nPosts}",
+    "description": "The title of the page for a blog author"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "home.sdk.description": {
+    "message": "Un client dactylographié pour les 241 opérations du SigNoz v0.142.1 API REST, une méthode par opérationId, avec une clé API ou les jetons de la session du navigateur pivotés pour vous."
+  },
+  "home.mcp.title": {
+    "message": "Serveur MCP"
+  },
+  "home.mcp.description": {
+    "message": "SigNoz pour Claude Code, Codex, OpenCode ou n'importe quel client MCP : journaux, traces, métriques et alertes, un constructeur de tableau de bord qui vérifie chaque panneau avant d'enregistrer, et des outils génériques pour le reste de l'API."
+  },
+  "home.cli.description": {
+    "message": "Chaque outil MCP en tant que commande terminal, plus signoz mcp pour exécuter le serveur en arrière-plan, le démarrer à la connexion et l'enregistrer dans vos clients."
+  },
+  "home.install.copied": {
+    "message": "Copié"
+  },
+  "home.install.copy": {
+    "message": "Copier"
+  },
+  "home.title": {
+    "message": "SigNoz SDK, serveur MCP et CLI"
+  },
+  "home.badge": {
+    "message": "TypeScript · SigNoz v0.142.1 · MCP · CLI"
+  },
+  "home.headline": {
+    "message": "Les SigNoz API, tapé fin à fin"
+  },
+  "home.tagline": {
+    "message": "A TypeScript SDK pour le SigNoz API, avec un serveur MCP et un CLI construit en plus. Utilisez-le à partir du code, d'un agent d'IA ou de votre terminal : les trois partagent le même client."
+  },
+  "home.getStarted": {
+    "message": "Commencez"
+  },
+  "theme.blog.archive.title": {
+    "message": "Archive",
+    "description": "The page & hero title of the blog archive page"
+  },
+  "theme.blog.archive.description": {
+    "message": "Archive",
+    "description": "The page & hero description of the blog archive page"
+  },
+  "theme.colorToggle.ariaLabel.mode.system": {
+    "message": "mode système",
+    "description": "The name for the system color mode"
+  },
+  "theme.docs.versionBadge.label": {
+    "message": "Version: {versionLabel}"
+  },
+  "theme.navbar.mobileVersionsDropdown.label": {
+    "message": "Versions",
+    "description": "The label for the navbar versions dropdown on mobile view"
+  },
+  "theme.admonition.danger": {
+    "message": "danger",
+    "description": "The default label used for the Danger admonition (:::danger)"
+  },
+  "theme.admonition.info": {
+    "message": "Informations",
+    "description": "The default label used for the Info admonition (:::info)"
+  },
+  "theme.IconExternalLink.ariaLabel": {
+    "message": "(ouvre dans un nouvel onglet)",
+    "description": "The ARIA label for the external link icon"
+  },
+  "theme.NavBar.navAriaLabel": {
+    "message": "Principale",
+    "description": "The ARIA label for the main navigation"
+  },
+  "theme.docs.sidebar.navAriaLabel": {
+    "message": "Barre latérale des docs",
+    "description": "The ARIA label for the sidebar navigation"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.expandAriaLabel": {
+    "message": "Élargir la liste déroulante",
+    "description": "The ARIA label of the button to expand the mobile dropdown navbar item"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.collapseAriaLabel": {
+    "message": "Réduire le déclin",
+    "description": "The ARIA label of the button to collapse the mobile dropdown navbar item"
+  },
+  "theme.SearchBar.noResultsText": {
+    "message": "Aucun résultat"
+  },
+  "theme.SearchBar.seeAllOutsideContext": {
+    "message": "Voir tous les résultats à l'extérieur \"{context}\""
+  },
+  "theme.SearchBar.searchInContext": {
+    "message": "Voir tous les résultats dans \"{context}\""
+  },
+  "theme.SearchBar.seeAll": {
+    "message": "Voir tous les résultats"
+  },
+  "theme.SearchBar.label": {
+    "message": "Recherche",
+    "description": "The ARIA label and placeholder for search button"
+  },
+  "theme.SearchPage.existingResultsTitle": {
+    "message": "Résultats de recherche pour \"{query}\"",
+    "description": "The search page title for non-empty query"
+  },
+  "theme.SearchPage.emptyResultsTitle": {
+    "message": "Recherche dans la documentation",
+    "description": "The search page title for empty query"
+  },
+  "theme.SearchPage.searchContext.everywhere": {
+    "message": "Partout"
+  },
+  "theme.SearchPage.documentsFound.plurals": {
+    "message": "1 document trouvé|{count} documents trouvés",
+    "description": "Pluralized label for \"{count} documents found\". Use as much plural forms (separated by \"|\") as your language support (see https://www.unicode.org/cldr/cldr-aux/charts/34/supplemental/language_plural_rules.html)"
+  },
+  "theme.SearchPage.noResultsText": {
+    "message": "Aucun document n'a été trouvé",
+    "description": "The paragraph for empty search result"
+  },
+  "theme.blog.author.pageTitle": {
+    "message": "{authorName} - {nPosts}",
+    "description": "The title of the page for a blog author"
+  },
+  "theme.blog.authorsList.pageTitle": {
+    "message": "Auteurs",
+    "description": "The title of the authors page"
+  },
+  "theme.blog.author.noPosts": {
+    "message": "Cet auteur n'a pas encore écrit de posts.",
+    "description": "The text for authors with 0 blog post"
+  },
+  "theme.contentVisibility.draftBanner.title": {
+    "message": "Projet de page",
+    "description": "The draft content banner title"
+  },
+  "theme.contentVisibility.draftBanner.message": {
+    "message": "Cette page est une ébauche. Elle ne sera visible qu'en dev et sera exclue de la production.",
+    "description": "The draft content banner message"
+  },
+  "theme.tags.tagsPageTitle": {
+    "message": "Étiquettes",
+    "description": "The title of the tag list page"
+  }
+}

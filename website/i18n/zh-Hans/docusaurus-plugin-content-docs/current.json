@@ -1,0 +1,18 @@
+{
+  "version.label": {
+    "message": "下一个",
+    "description": "The label for version current"
+  },
+  "sidebar.guides.category.SDK": {
+    "message": "SDK",
+    "description": "The label for category 'SDK' in sidebar 'guides'"
+  },
+  "sidebar.guides.category.MCP server": {
+    "message": "MCP 服务器",
+    "description": "The label for category 'MCP server' in sidebar 'guides'"
+  },
+  "sidebar.guides.category.CLI": {
+    "message": "CLI",
+    "description": "The label for category 'CLI' in sidebar 'guides'"
+  }
+}

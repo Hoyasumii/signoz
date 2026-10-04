@@ -1,0 +1,42 @@
+{
+  "link.title.Docs": {
+    "message": "文件",
+    "description": "The title of the footer links column with title=Docs in the footer"
+  },
+  "link.title.Package": {
+    "message": "套件",
+    "description": "The title of the footer links column with title=Package in the footer"
+  },
+  "link.item.label.Getting started": {
+    "message": "開始",
+    "description": "The label of footer link with label=Getting started linking to /docs/intro"
+  },
+  "link.item.label.SDK": {
+    "message": "SDK",
+    "description": "The label of footer link with label=SDK linking to /docs/sdk/overview"
+  },
+  "link.item.label.MCP server": {
+    "message": "MCP 伺服器",
+    "description": "The label of footer link with label=MCP server linking to /docs/mcp/overview"
+  },
+  "link.item.label.CLI": {
+    "message": "CLI",
+    "description": "The label of footer link with label=CLI linking to /docs/cli/overview"
+  },
+  "link.item.label.npm": {
+    "message": "npm",
+    "description": "The label of footer link with label=npm linking to https://www.npmjs.com/package/@hoyasumii/signoz"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/Hoyasumii/signoz"
+  },
+  "link.item.label.Issues": {
+    "message": "工作",
+    "description": "The label of footer link with label=Issues linking to https://github.com/Hoyasumii/signoz/issues"
+  },
+  "copyright": {
+    "message": "麻省理工的執照 未加入或得到 SigNoz 公司“SigNoz是他們的標籤。",
+    "description": "The footer copyright"
+  }
+}

@@ -61,5 +61,13 @@
   },
   "theme.SearchPage.searchContext.everywhere": {
     "message": "Em todo lugar"
+  },
+  "theme.IconExternalLink.ariaLabel": {
+    "message": "(Abre em nova aba)",
+    "description": "The ARIA label for the external link icon"
+  },
+  "theme.blog.author.pageTitle": {
+    "message": "{authorName} - {nPosts}",
+    "description": "The title of the page for a blog author"
   }
 }

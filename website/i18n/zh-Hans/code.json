@@ -1,0 +1,55 @@
+{
+  "home.sdk.description": {
+    "message": "用于 241 操作的输入客户端 SigNoz v0.142.1 REST API,每个操作Id的一种方法,带有API密钥或浏览器会话的符号为您旋转."
+  },
+  "home.mcp.title": {
+    "message": "MCP 服务器"
+  },
+  "home.mcp.description": {
+    "message": "SigNoz (单位:千美元) Claude Code, (中文). Codex, (中文). OpenCode 或任何MCP客户端:日志,痕迹,度量衡和提示,一个在保存前检查每个面板的仪表板构建器,以及API其余部分的通用工具."
+  },
+  "home.cli.description": {
+    "message": "每个作为终端命令的MCP工具,加上sondoz mcp来在背景中运行服务器,在登录时启动并在客户端注册."
+  },
+  "home.install.copied": {
+    "message": "复制"
+  },
+  "home.install.copy": {
+    "message": "复制"
+  },
+  "home.title": {
+    "message": "SigNoz SDK, MCP 服务器和 CLI"
+  },
+  "home.badge": {
+    "message": "TypeScript · SigNoz v0.142.1 · MCP · CLI"
+  },
+  "home.headline": {
+    "message": "那个 SigNoz API, 键入端到端"
+  },
+  "home.tagline": {
+    "message": "页:1 TypeScript SDK为 SigNoz API,有一个MCP服务器和一个CLI建在它的上面. 从代码,从AI代理或从您的终端使用它:所有三个共享同一个客户端."
+  },
+  "home.getStarted": {
+    "message": "开始吧"
+  },
+  "theme.colorToggle.ariaLabel.mode.system": {
+    "message": "系统模式",
+    "description": "The name for the system color mode"
+  },
+  "theme.IconExternalLink.ariaLabel": {
+    "message": "(打开新标签)",
+    "description": "The ARIA label for the external link icon"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.expandAriaLabel": {
+    "message": "扩展下拉",
+    "description": "The ARIA label of the button to expand the mobile dropdown navbar item"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.collapseAriaLabel": {
+    "message": "折叠下拉",
+    "description": "The ARIA label of the button to collapse the mobile dropdown navbar item"
+  },
+  "theme.blog.author.pageTitle": {
+    "message": "{authorName} - {nPosts}",
+    "description": "The title of the page for a blog author"
+  }
+}

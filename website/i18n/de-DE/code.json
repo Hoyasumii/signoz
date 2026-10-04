@@ -1,0 +1,130 @@
+{
+  "home.sdk.description": {
+    "message": "Ein typisierter Client für die 241 Operationen des SigNoz v0.142.1 REST API, eine Methode pro OperationId, mit einem API-Schlüssel oder den für Sie gedrehten Token der Browsersitzung."
+  },
+  "home.mcp.title": {
+    "message": "MCP-Server"
+  },
+  "home.mcp.description": {
+    "message": "SigNoz für Claude Code, Codex, OpenCode oder jeder MCP-Client: Protokolle, Traces, Metriken und Warnungen, ein Dashboard-Builder, der jedes Panel vor dem Speichern überprüft, und generische Tools für den Rest der API."
+  },
+  "home.cli.description": {
+    "message": "Jedes MCP-Tool als Terminal-Befehl plus signoz mcp, um den Server im Hintergrund auszuführen, ihn bei der Anmeldung zu starten und in Ihren Clients zu registrieren."
+  },
+  "home.install.copied": {
+    "message": "kopiert"
+  },
+  "home.install.copy": {
+    "message": "Kopie"
+  },
+  "home.title": {
+    "message": "SigNoz SDK, MCP Server und CLI"
+  },
+  "home.badge": {
+    "message": "TypeScript · SigNoz v0.142.1 · MCP · CLI"
+  },
+  "home.headline": {
+    "message": "Die SigNoz API, typisiert Ende zu Ende"
+  },
+  "home.tagline": {
+    "message": "A TypeScript SDK für die SigNoz API, mit einem MCP-Server und einer darauf aufbauenden CLI. Verwenden Sie es von Code, von einem KI-Agenten oder von Ihrem Terminal: Alle drei teilen sich den gleichen Client."
+  },
+  "home.getStarted": {
+    "message": "Beginn"
+  },
+  "theme.colorToggle.ariaLabel.mode.system": {
+    "message": "Systemmodus",
+    "description": "The name for the system color mode"
+  },
+  "theme.docs.breadcrumbs.navAriaLabel": {
+    "message": "Brotkrumen",
+    "description": "The ARIA label for the breadcrumbs"
+  },
+  "theme.docs.versionBadge.label": {
+    "message": "Version: {versionLabel}"
+  },
+  "theme.tags.tagsListLabel": {
+    "message": "Tags:",
+    "description": "The label alongside a tag list"
+  },
+  "theme.admonition.info": {
+    "message": "Infos",
+    "description": "The default label used for the Info admonition (:::info)"
+  },
+  "theme.DocSidebarItem.expandCategoryAriaLabel": {
+    "message": "Erweitern Sidebar Kategorie{label}„",
+    "description": "The ARIA label to expand the sidebar category"
+  },
+  "theme.DocSidebarItem.collapseCategoryAriaLabel": {
+    "message": "Kategorie des Seitenleistenkollapses{label}„",
+    "description": "The ARIA label to collapse the sidebar category"
+  },
+  "theme.IconExternalLink.ariaLabel": {
+    "message": "(wird im neuen Tab geöffnet)",
+    "description": "The ARIA label for the external link icon"
+  },
+  "theme.NavBar.navAriaLabel": {
+    "message": "Hauptverwaltung",
+    "description": "The ARIA label for the main navigation"
+  },
+  "theme.CodeBlock.wordWrapToggle": {
+    "message": "Toggle Word Wrap",
+    "description": "The title attribute for toggle word wrapping button of code block lines"
+  },
+  "theme.docs.breadcrumbs.home": {
+    "message": "Startseite",
+    "description": "The ARIA label for the home page in the breadcrumbs"
+  },
+  "theme.docs.sidebar.navAriaLabel": {
+    "message": "Docs Sidebar",
+    "description": "The ARIA label for the sidebar navigation"
+  },
+  "theme.docs.sidebar.closeSidebarButtonAriaLabel": {
+    "message": "Navigationsleiste schließen",
+    "description": "The ARIA label for close button of mobile sidebar"
+  },
+  "theme.docs.sidebar.toggleSidebarButtonAriaLabel": {
+    "message": "Navigationsleiste umschalten",
+    "description": "The ARIA label for hamburger menu button of mobile navigation"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.expandAriaLabel": {
+    "message": "Erweitern Sie den Dropdown",
+    "description": "The ARIA label of the button to expand the mobile dropdown navbar item"
+  },
+  "theme.navbar.mobileDropdown.collapseButton.collapseAriaLabel": {
+    "message": "Zusammenbruch des Dropdowns",
+    "description": "The ARIA label of the button to collapse the mobile dropdown navbar item"
+  },
+  "theme.blog.author.pageTitle": {
+    "message": "{authorName} - {nPosts}",
+    "description": "The title of the page for a blog author"
+  },
+  "theme.blog.authorsList.pageTitle": {
+    "message": "Autoren",
+    "description": "The title of the authors page"
+  },
+  "theme.blog.author.noPosts": {
+    "message": "Dieser Autor hat noch keine Posts geschrieben.",
+    "description": "The text for authors with 0 blog post"
+  },
+  "theme.contentVisibility.unlistedBanner.title": {
+    "message": "Nicht aufgeführte Seite",
+    "description": "The unlisted content banner title"
+  },
+  "theme.contentVisibility.unlistedBanner.message": {
+    "message": "Diese Seite ist nicht aufgeführt. Suchmaschinen indizieren es nicht, und nur Benutzer mit einem direkten Link können darauf zugreifen.",
+    "description": "The unlisted content banner message"
+  },
+  "theme.contentVisibility.draftBanner.title": {
+    "message": "Entwurfsseite",
+    "description": "The draft content banner title"
+  },
+  "theme.contentVisibility.draftBanner.message": {
+    "message": "Diese Seite ist ein Entwurf. Es wird nur im Dev sichtbar sein und vom Production Build ausgeschlossen.",
+    "description": "The draft content banner message"
+  },
+  "theme.tags.tagsPageTitle": {
+    "message": "Tags",
+    "description": "The title of the tag list page"
+  }
+}

@@ -12,6 +12,15 @@ const isDefaultLocale = (process.env.DOCUSAURUS_CURRENT_LOCALE ?? "en") === "en"
 const labels: Record<string, string> = {
   en: "English",
   "pt-BR": "Português (Brasil)",
+  "pt-PT": "Português (Portugal)",
+  "es-ES": "Español (España)",
+  "es-419": "Español (Latinoamérica)",
+  "fr-FR": "Français (France)",
+  "fr-CA": "Français (Canada)",
+  "de-DE": "Deutsch (Deutschland)",
+  "de-CH": "Deutsch (Schweiz)",
+  "zh-Hans": "简体中文",
+  "zh-Hant": "繁體中文",
 };
 
 /**
@@ -114,7 +123,7 @@ const config: Config = {
 
   i18n: {
     defaultLocale: "en",
-    locales: ["en", "pt-BR"],
+    locales: ["en", "pt-BR", "pt-PT", "es-ES", "es-419", "fr-FR", "fr-CA", "de-DE", "de-CH", "zh-Hans", "zh-Hant"],
     // Every baseUrl is explicit. scripts/build.mjs builds one locale per `docusaurus build --locale`,
     // and a build given a single locale drops the /<locale>/ segment from every inferred baseUrl
     // (meant for one domain per locale), which would serve pt-BR at /signoz/ and point the language
@@ -176,7 +185,7 @@ const config: Config = {
       {
         hashed: true,
         indexBlog: false,
-        language: ["en", "pt"],
+        language: ["en", "pt", "es", "fr", "de", "zh"],
         ignoreFiles: [/(^|\/)docs\/api(\/|$)/],
         highlightSearchTermsOnTargetPage: true,
       },

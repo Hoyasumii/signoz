@@ -1,0 +1,42 @@
+{
+  "link.title.Docs": {
+    "message": "Docs",
+    "description": "The title of the footer links column with title=Docs in the footer"
+  },
+  "link.title.Package": {
+    "message": "Paquete",
+    "description": "The title of the footer links column with title=Package in the footer"
+  },
+  "link.item.label.Getting started": {
+    "message": "Comienzo",
+    "description": "The label of footer link with label=Getting started linking to /docs/intro"
+  },
+  "link.item.label.SDK": {
+    "message": "SDK",
+    "description": "The label of footer link with label=SDK linking to /docs/sdk/overview"
+  },
+  "link.item.label.MCP server": {
+    "message": "MCP server",
+    "description": "The label of footer link with label=MCP server linking to /docs/mcp/overview"
+  },
+  "link.item.label.CLI": {
+    "message": "CLI",
+    "description": "The label of footer link with label=CLI linking to /docs/cli/overview"
+  },
+  "link.item.label.npm": {
+    "message": "npm",
+    "description": "The label of footer link with label=npm linking to https://www.npmjs.com/package/@hoyasumii/signoz"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/Hoyasumii/signoz"
+  },
+  "link.item.label.Issues": {
+    "message": "Cuestiones",
+    "description": "The label of footer link with label=Issues linking to https://github.com/Hoyasumii/signoz/issues"
+  },
+  "copyright": {
+    "message": "MIT con licencia. No afiliado o respaldado por SigNoz Inc. “SigNoz” es su marca.",
+    "description": "The footer copyright"
+  }
+}
